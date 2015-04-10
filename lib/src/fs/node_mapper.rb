@@ -34,8 +34,12 @@ module SRC
         instance_eval(&block) if block_given?
       end
 
-      def scan
-        @nodes = scan_path(@path)
+      def scan(custom_opts = {})
+        opts = {
+          deep: true
+        }.merge!(custom_opts)
+
+        @nodes = scan_path(@path, opts[:deep])
       end
 
       def metify
@@ -143,7 +147,7 @@ module SRC
         })
       end
 
-      def scan_path(path)
+      def scan_path(path, deep = true)
         nodes = {}
 
         Dir.glob("#{path}/*") do |node_path|
@@ -152,7 +156,10 @@ module SRC
 
           if File.directory?(node_path)
             nodes[node_name]['type']  = 'dir'
-            nodes[node_name]['nodes'] = scan_path(node_path)
+
+            if deep
+              nodes[node_name]['nodes'] = scan_path(node_path)
+            end
           end
         end
 

@@ -15,9 +15,45 @@ describe SRC::FS::NodeMapper do
     end
   end
 
+  context 'scan' do
+    before(:all) do
+      @mapper = SRC::FS::NodeMapper.new(File.expand_path('../../../', File.dirname(__FILE__)))
+    end
+
+    context 'deeply' do
+      it 'should scan sub nodes by default' do
+        dir_node = nil
+
+        @mapper.scan
+        @mapper.nodes.each do |node, node_data|
+          if node_data['type'] == 'dir'
+            dir_node = node_data
+            break
+          end
+        end
+
+        expect(dir_node['nodes']).to be_a(Hash)
+      end
+    end
+
+    it 'should not scan sub nodes if deep:false' do
+      dir_node = nil
+
+      @mapper.scan deep: false
+      @mapper.nodes.each do |node, node_data|
+        if node_data['type'] == 'dir'
+          dir_node = node_data
+          break
+        end
+      end
+
+      expect(dir_node.has_key?('nodes')).to be(false)
+    end
+  end
+
   context 'nodes' do
     before(:all) do
-      @mapper = SRC::FS::NodeMapper.new(File.expand_path('../', File.dirname(__FILE__)))
+      @mapper = SRC::FS::NodeMapper.new(File.expand_path('../../../', File.dirname(__FILE__)))
 
       @mapper.scan
     end
