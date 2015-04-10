@@ -34,20 +34,20 @@ describe SRC::FS::NodeMapper do
 
         expect(dir_node['nodes']).to be_a(Hash)
       end
-    end
 
-    it 'should not scan sub nodes if deep:false' do
-      dir_node = nil
+      it 'should not scan sub nodes if deep:false' do
+        dir_node = nil
 
-      @mapper.scan deep: false
-      @mapper.nodes.each do |node, node_data|
-        if node_data['type'] == 'dir'
-          dir_node = node_data
-          break
+        @mapper.scan deep: false
+        @mapper.nodes.each do |node, node_data|
+          if node_data['type'] == 'dir'
+            dir_node = node_data
+            break
+          end
         end
-      end
 
-      expect(dir_node.has_key?('nodes')).to be(false)
+        expect(dir_node.has_key?('nodes')).to be(false)
+      end
     end
   end
 
