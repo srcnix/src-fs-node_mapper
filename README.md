@@ -60,7 +60,16 @@ Metifying the data will allow you to dynamically and easily apply meta data agai
 dir_mapper = SRC::FS::NodeMapper.new('/var/www/sites')
 dir_mapper.scan # Scans directory structure and maps to hash
 
-dir_mapper.nodes # => dir_1' => { 'type' => 'dir', 'path' => '/var/www/sites/dir_1', 'nodes' => {...
+dir_mapper.nodes # => { dir_1' => { 'type' => 'dir', 'path' => '/var/www/sites/dir_1', 'nodes' => {...
+```
+
+By default, scan will scan deeply. You can disable deep scans to the first level by padding deep:false.
+
+```ruby
+dir_mapper = SRC::FS::NodeMapper.new('/var/www/sites')
+dir_mapper.scan deep: false # Scans first level
+
+dir_mapper.nodes # => { dir_1' => { 'type' => 'dir', 'path' => '/var/www/sites/dir_1' }...
 ```
 
 ### Store mapped nodes in cache
@@ -91,14 +100,14 @@ To read from the cache, pass in cache: true as an optional param.
 
 ```ruby
 dir_mapper_cached = SRC::FS::NodeMapper.new('/var/www/sites', cache: true)
-dir_mapper_cached.nodes # => dir_1' => { 'type' => 'dir', 'path' => '/var/www/sites/dir_1', 'nodes' => {...
+dir_mapper_cached.nodes # => { dir_1' => { 'type' => 'dir', 'path' => '/var/www/sites/dir_1', 'nodes' => {...
 ```
 
 If you have a custom cache file name, ensure you pass it in when reading from the cache.
 
 ```ruby
 dir_mapper_cached = SRC::FS::NodeMapper.new('/var/www/sites', cache: true, cache_file: '.my_cache')
-dir_mapper_cached.nodes # => dir_1' => { 'type' => 'dir', 'path' => '/var/www/sites/dir_1', 'nodes' => {...
+dir_mapper_cached.nodes # => { dir_1' => { 'type' => 'dir', 'path' => '/var/www/sites/dir_1', 'nodes' => {...
 ```
 
 ### Re-scan (remap) after cache exists
@@ -142,7 +151,7 @@ end
 
 dir_mapper.scan # Maps nodes
 dir_mapper.metify # Applies meta rules
-dir_mapper.nodes # => # => dir_1' => { 'type' => 'dir', 'path' => '/var/www/sites/dir_1', 'nodes' => {...
+dir_mapper.nodes # => # => { dir_1' => { 'type' => 'dir', 'path' => '/var/www/sites/dir_1', 'nodes' => {...
 dir_mapper.node_meta # => { '/var/www/sites/file_1' => { 'length' => 16 }...
 ```
 
