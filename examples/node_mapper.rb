@@ -37,42 +37,35 @@ def display_nodes(nodes, node_meta, lvl = 0)
   end
 end
 
-benchmark = Benchmark.measure {
-  dir_mapper = SRC::FS::NodeMapper.new(path) do
-    meta_rule /\/var\/www\/gems\/src\/src\-fs\-node_mapper\/bin\/(.*)/, 'content_length' do |node|
-      node_content.length
-    end
+Benchmark.bm do |x|
+  x.report('Direct') do
+    dir_mapper = SRC::FS::NodeMapper.new(path) do
+      meta_rule /\/var\/www\/gems\/src\/src\-fs\-node_mapper\/bin\/(.*)/, 'content_length' do |node|
+        node_content.length
+      end
 
-    meta_rule '/var/www/gems/src/src-fs-node_mapper/*', :ext, include_nil: false do |node|
-      if node['type'].to_sym == :file
-        File.extname(node['path'])
+      meta_rule '/var/www/gems/src/src-fs-node_mapper/*', :ext, include_nil: false do |node|
+        if node['type'].to_sym == :file
+          File.extname(node['path'])
+        end
       end
     end
+
+    dir_mapper.scan
+    dir_mapper.metify
+    dir_mapper.cache
+
+    nodes     = dir_mapper.nodes
+    node_meta = dir_mapper.node_meta
+
+    #display_nodes(nodes, node_meta)
   end
 
-  dir_mapper.scan
-  dir_mapper.metify
-  dir_mapper.cache
+  x.report('Cached') do
+    dir_mapper  = SRC::FS::NodeMapper.new(path, cache: true)
+    nodes       = dir_mapper.nodes
+    node_meta   = dir_mapper.node_meta()
 
-  nodes     = dir_mapper.nodes
-  node_meta = dir_mapper.node_meta
-}
-
-display_nodes(nodes, node_meta)
-
-puts '###################################################################'
-puts "Scan processing time: #{benchmark}"
-puts '###################################################################'
-
-node_meta = {}
-benchmark = Benchmark.measure {
-  dir_mapper  = SRC::FS::NodeMapper.new(path, cache: true)
-  nodes       = dir_mapper.nodes
-  node_meta   = dir_mapper.node_meta()
-}
-
-display_nodes(nodes, node_meta)
-
-puts '#####################################################################'
-puts "Cached processing time: #{benchmark}"
-puts '#####################################################################'
+    #display_nodes(nodes, node_meta)
+  end
+end
